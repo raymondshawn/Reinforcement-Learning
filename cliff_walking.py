@@ -29,7 +29,7 @@ def initialise_Qtable(states, actions):
     return q_table
 
 
-Q_table = initialise_Qtable(4, 12)
+Q_table = initialise_Qtable(states,actions)
 print(Q_table)
 
 
@@ -85,3 +85,47 @@ def train(n_training_episodes, min_epsilon, max_epsilon, decay_rate, env, max_st
             # Our next state is the new state
             state = new_state
     return Qtable
+
+
+Qtable_cliff = train(n_training_episodes, min_epsilon, max_epsilon, decay_rate, env, max_steps, Q_table)
+
+print(Qtable_cliff)
+
+def evaluate_agent(env, max_steps, n_eval_episodes, Q, seed):
+    """
+    Evaluate the agent for ``n_eval_episodes`` episodes and returns average reward and std of reward.
+    :param env: The evaluation environment
+    :param n_eval_episodes: Number of episode to evaluate the agent
+    :param Q: The Q-table
+    :param seed: The evaluation seed array (for taxi-v3)
+    """
+    episode_rewards = []
+    for episode in tqdm(range(n_eval_episodes)):
+        if seed:
+            state, info = env.reset(seed=seed[episode])
+        else:
+            state, info = env.reset()
+        step = 0
+        truncated = False
+        terminated = False
+        total_rewards_ep = 0
+
+        for step in range(max_steps):
+            # Take the action (index) that have the maximum expected future reward given that state
+            action = greedy_policy(Q, state)
+            new_state, reward, terminated, truncated, info = env.step(action)
+            total_rewards_ep += reward
+
+            if terminated or truncated:
+                break
+            state = new_state
+        episode_rewards.append(total_rewards_ep)
+    mean_reward = np.mean(episode_rewards)
+    std_reward = np.std(episode_rewards)
+
+    return mean_reward, std_reward
+
+
+# Evaluate our Agent
+mean_reward, std_reward = evaluate_agent(env, max_steps, n_eval_episodes, Qtable_cliff, eval_seed)
+print(f"Mean_reward={mean_reward:.2f} +/- {std_reward:.2f}")

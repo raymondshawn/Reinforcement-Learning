@@ -20,7 +20,7 @@ class GridWindow:
             for j in range(self.columns):
                 value = tk.StringVar()  # Variable to hold the value of the cell
                 value.set(0)  # Set initial value to zero
-                button = tk.Button(window, textvariable=value, padx=20, pady=20, relief=tk.RIDGE, font=custom_font)
+                button = tk.Button(window, textvariable=value, padx=50, pady=50, relief=tk.RIDGE, font=custom_font)
                 button.grid(row=i, column=j)
                 row.append((button, value))
             self.cells.append(row)

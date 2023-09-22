@@ -41,20 +41,21 @@ class GridWindow:
         
     def play(self):
         # Generate random coordinates
-random_row = random.randint(0, 2)
-random_column = random.randint(0, 2)
+        random_row = random.randint(0, 4)
+        random_column = random.randint(0, 4)
 
 # Get the randomly selected button
-random_button = buttons[random_row][random_column]
+        random_cell = self.cells[random_row][random_column]
 
 # Programmatically trigger the click event on the randomly selected button
-random_button.invoke()
+        random_cell.invoke()
 
 # Create an instance of GridWindow with 4 rows and 4 columns
 grid_window = GridWindow(4, 4)
 
 # Call the create_grid method to create the grid
 grid_window.create_grid()
+grid_window.play()
 """
 # Access and modify a cell in the grid
 cell_2_3_value = grid_window.get_cell_value(1, 2)

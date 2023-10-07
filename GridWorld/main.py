@@ -1,7 +1,7 @@
 import tkinter as tk
-from tkinter import font,messagebox
 import random
 import time
+import math
 class GridWindow():
     def __init__(self, rows, columns):
         super().__init__()
@@ -9,16 +9,31 @@ class GridWindow():
         self.columns = columns
         self.cells = []  # List to store the buttons and values
         self.window=tk.Tk()
-        
+        self.clicked_cell = None         
 
+    def on_cell_click(self, row, column):
+        #print("click")
+        self.clicked_cell = (row, column)
+        self.update_clicked_cell_value()
 
+    def update_clicked_cell_value(self):
+        if self.clicked_cell:
+            
+            row, column = self.clicked_cell
+            self.cells[row][column][0].configure(bg="blue",fg="blue")
+            #value = self.cells[row][column][1]
+            #new_value = int(value.get()) + 1
+            #value.set(new_value)
+
+    def get_clicked_cell_value(self):
+        if self.clicked_cell:
+            row, column = self.clicked_cell
+            return self.cells[row][column][1].get()
+        else:
+            return None
     def run(self):
         self.window.mainloop()
-    def button_click(self,row,col):
-        #print(self.get_cell_value(row,column))
-        print(row,col)
-       
-        print(f"event click")
+    
     def create_grid(self):
         # Create the main window
        
@@ -32,13 +47,13 @@ class GridWindow():
             for j in range(self.columns):
                 value = tk.StringVar()  # Variable to hold the value of the cell
                 value.set(0)  # Set initial value to zero
-                button = tk.Button(self.window, textvariable=value, padx=50, pady=50, relief=tk.RIDGE,command=lambda r=i, c=j: self.button_click(r, c))
+                button = tk.Button(self.window, textvariable=value, padx=50, pady=50, relief=tk.RIDGE,command=lambda r=i, c=j: self.on_cell_click(r, c))
                 button.grid(row=i, column=j)
                 
                 row.append((button, value))
             self.cells.append(row)
         return self.cells
-        # Run the main event loop
+        
        
 
     def get_cell_value(self, row, column):
@@ -51,7 +66,7 @@ class GridWindow():
 
 # Create an instance of GridWindow with 4 rows and 4 columns
 grid_window = GridWindow(4, 4)
-grid=grid_window.create_grid()
+#grid=grid_window.create_grid()
 
 
 
@@ -73,23 +88,47 @@ class Game:
         self.window=self.grid_window.window
         self.grid=gridwindow.create_grid()
         self.goal=self.grid[3][3]
-        self.clicked=None
         self.finished=False
     def run(self):
         self.window.mainloop()        
     def play(self):
-        
+        row=0
+        col=0
+        start_cell=self.grid[row][col][0]
+            
+        start_cell.invoke()
         while True:
             self.window.update()
-            row=random.randint(0,3)
-            col=random.randint(0,3)
+            
+            target=(3,3)
+            right=(row,col+1)
+            left=(row,col-1)
+            up=(row+1,col)
+            down=(row-1,col)
+            
+            up_distance=math.dist(up,target)
+        
+            down_distance=math.dist(down,target)
+            right_distance=math.dist(right,target)
+            left_distance=math.dist(left,target)
+            distances={'up':up_distance,'down':down_distance,'right':right_distance,'left':left_distance}
+            key_with_smallest_value = min(distances, key=distances.get)
             if row==3 and col==3:
                 print(f"end {row,col}")
                 break
+            elif key_with_smallest_value=='up':
+                row,col=up[0],up[1]
+            elif key_with_smallest_value=='down':
+                row,col=down[0],down[1]
+            elif key_with_smallest_value=='right':
+                row,col=right[0],right[1]
+            elif key_with_smallest_value=='left':
+                row,col=left[0],left[1]
+            
             random_cell=self.grid[row][col][0]
-            #self.window.after(0,random_cell.invoke)
+            
             random_cell.invoke()
-            random_cell.configure(background="blue")
+            
             
             print(f'in play {row,col}')
             time.sleep(3)  
